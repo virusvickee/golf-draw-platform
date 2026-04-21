@@ -190,6 +190,14 @@ create policy "Users manage own scores" on public.scores
 drop policy if exists "Users view own subscription" on public.subscriptions;
 create policy "Users view own subscription" on public.subscriptions
   for select using (auth.uid() = user_id or public.is_admin());
+
+drop policy if exists "Users manage own subscription" on public.subscriptions;
+create policy "Users manage own subscription" on public.subscriptions
+  for insert with check (auth.uid() = user_id);
+
+create policy "Users update own subscription" on public.subscriptions
+  for update using (auth.uid() = user_id);
+
 drop policy if exists "Admins manage subscriptions" on public.subscriptions;
 create policy "Admins manage subscriptions" on public.subscriptions
   for all using (public.is_admin());
