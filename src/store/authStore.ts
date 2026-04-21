@@ -32,7 +32,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         .from("profiles")
         .select("*")
         .eq("id", session.user.id)
-        .single()
+        .maybeSingle()
       
       if (profile) set({ profile })
 
@@ -43,7 +43,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         .eq("user_id", session.user.id)
         .order("created_at", { ascending: false })
         .limit(1)
-        .single()
+        .maybeSingle()
 
       if (sub) set({ subscription: sub })
     } else {

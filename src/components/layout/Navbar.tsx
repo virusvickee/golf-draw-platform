@@ -1,10 +1,14 @@
 import { Link } from "react-router-dom"
+import { useState } from "react"
 import { useAuthStore } from "../../store/authStore"
 import { Button, buttonVariants } from "../ui/button"
+import { Settings, Bell } from "lucide-react"
+import { NotificationDrawer } from "./NotificationDrawer"
 
 
 export function Navbar() {
   const { user, profile, signOut } = useAuthStore()
+  const [showNotifications, setShowNotifications] = useState(false)
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-white/10 bg-[#080B14]/80 backdrop-blur supports-[backdrop-filter]:bg-[#080B14]/60">
@@ -26,6 +30,17 @@ export function Navbar() {
                 <Link to="/admin" className={buttonVariants({ variant: "outline", className: "border-[#FFD700] text-[#FFD700] hover:bg-[#FFD700]/10" })}>Admin</Link>
               )}
               <Link to="/dashboard" className={buttonVariants({ variant: "ghost", className: "text-white hover:text-[#00FF87] hover:bg-white/5" })}>Dashboard</Link>
+              <button 
+                title="Notifications"
+                onClick={() => setShowNotifications(true)}
+                className={buttonVariants({ variant: "ghost", size: "icon", className: "text-slate-400 hover:text-white relative" })}
+              >
+                <Bell className="h-5 w-5" />
+                <span className="absolute top-2 right-2 w-2 h-2 bg-[#00FF87] rounded-full border-2 border-[#080B14]"></span>
+              </button>
+              <Link title="Settings" to="/settings" className={buttonVariants({ variant: "ghost", size: "icon", className: "text-slate-400 hover:text-white" })}>
+                <Settings className="h-5 w-5" />
+              </Link>
               <Button variant="destructive" onClick={signOut}>Sign Out</Button>
             </>
           ) : (
@@ -36,6 +51,7 @@ export function Navbar() {
           )}
         </div>
       </div>
+      <NotificationDrawer isOpen={showNotifications} onClose={() => setShowNotifications(false)} />
     </nav>
   )
 }
