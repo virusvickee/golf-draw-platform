@@ -46,7 +46,7 @@ export default function DashboardPage() {
         .from("charities")
         .select("*")
         .eq("id", profile.selected_charity_id)
-        .single()
+        .maybeSingle()
         
       if (!error && data) {
         setCharity(data)
@@ -67,7 +67,7 @@ export default function DashboardPage() {
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
         .limit(1)
-        .single()
+        .maybeSingle()
         
       if (data) setWinner(data as Winner)
     } catch (err) {
