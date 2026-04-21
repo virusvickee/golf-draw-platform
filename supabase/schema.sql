@@ -157,6 +157,7 @@ alter table public.draws enable row level security;
 alter table public.draw_entries enable row level security;
 alter table public.winners enable row level security;
 alter table public.charities enable row level security;
+alter table public.charity_events enable row level security;
 alter table public.charity_contributions enable row level security;
 
 -- =============================================
@@ -206,6 +207,11 @@ create policy "Admins manage subscriptions" on public.subscriptions
 drop policy if exists "Users view own winners" on public.winners;
 create policy "Users view own winners" on public.winners
   for select using (auth.uid() = user_id or public.is_admin());
+
+drop policy if exists "Users update own winners" on public.winners;
+create policy "Users update own winners" on public.winners
+  for update using (auth.uid() = user_id);
+
 drop policy if exists "Admins manage winners" on public.winners;
 create policy "Admins manage winners" on public.winners
   for all using (public.is_admin());
@@ -216,6 +222,14 @@ create policy "Anyone view charities" on public.charities
   for select using (true);
 drop policy if exists "Admins manage charities" on public.charities;
 create policy "Admins manage charities" on public.charities
+  for all using (public.is_admin());
+
+-- Charity Events
+drop policy if exists "Anyone view events" on public.charity_events;
+create policy "Anyone view events" on public.charity_events
+  for select using (true);
+drop policy if exists "Admins manage events" on public.charity_events;
+create policy "Admins manage events" on public.charity_events
   for all using (public.is_admin());
 
 -- Draws
