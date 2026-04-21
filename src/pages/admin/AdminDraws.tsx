@@ -83,6 +83,7 @@ export default function AdminDraws() {
       // Set Simulation State (NO DB SAVE)
       setSimulation({
         drawnNumbers,
+        participants: validUsers.map(uid => ({ id: uid, scores: userMaps[uid] })),
         poolDetails: {
           total: totalPoolSize,
           rollover: rolledOverAmount,
@@ -110,7 +111,7 @@ export default function AdminDraws() {
       // 1. Insert Draw
       const isRollover = simulation.winners[5] === 0
 
-      const { error: drawError } = await supabase.from("draws").insert({
+      const { data, error: drawError } = await supabase.from("draws").insert({
         draw_month: new Date().toISOString(),
         status: 'published',
         draw_type: useAlgorithmic ? 'algorithmic' : 'random',
@@ -125,9 +126,43 @@ export default function AdminDraws() {
       }).select().single()
 
       if (drawError) throw drawError
+      const drawId = data.id 
 
-      // Note: Full winner persistence would normally happen here (iterating valid users, saving entries & win proofs)
-      // We simulate success for UI completeness
+      // 2. Create Winner Records
+      const winnerRecords: any[] = []
+      
+      simulation.participants.forEach((p: any) => {
+        const matchCount = checkMatch(simulation.drawnNumbers, p.scores)
+        if (matchCount >= 3) {
+          let prize = 0
+          let type = ''
+          
+          if (matchCount === 5) {
+            prize = simulation.poolDetails.jackpot / simulation.winners[5]
+            type = '5-match'
+          } else if (matchCount === 4) {
+            prize = simulation.poolDetails.second / simulation.winners[4]
+            type = '4-match'
+          } else {
+            prize = simulation.poolDetails.third / simulation.winners[3]
+            type = '3-match'
+          }
+
+          winnerRecords.push({
+            draw_id: drawId,
+            user_id: p.id,
+            match_type: type,
+            prize_amount: prize,
+            verification_status: 'pending',
+            payment_status: 'pending'
+          })
+        }
+      })
+
+      if (winnerRecords.length > 0) {
+        const { error: winError } = await supabase.from("winners").insert(winnerRecords)
+        if (winError) throw winError
+      }
       
       toast.success("Draw Published! Winners have been recorded.")
       setSimulation(null)

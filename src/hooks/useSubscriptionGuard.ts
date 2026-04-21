@@ -33,10 +33,21 @@ export function useSubscriptionGuard(options?: GuardOptions) {
 
     // 3. Require Subscription Check
     if (requireSubscription) {
+      // Primary onboarding: Has user selected a charity?
+      // Skip check for admins
+      if (profile?.role === "subscriber" && !profile?.selected_charity_id) {
+        if (location.pathname !== "/select-charity") {
+          navigate("/select-charity", { replace: true })
+          return
+        }
+      }
+
       if (!subscription || subscription.status !== "active") {
         // If not active, redirect to subscribe page
-        navigate("/subscribe", { replace: true, state: { lapsed: subscription?.status === "lapsed" } })
-        return
+        if (location.pathname !== "/subscribe") {
+          navigate("/subscribe", { replace: true, state: { lapsed: subscription?.status === "lapsed" } })
+          return
+        }
       }
     }
   }, [user, profile, subscription, loading, navigate, location.pathname, requireAuth, requireAdmin, requireSubscription])
