@@ -148,10 +148,10 @@ export function ScoreHistory({ scores, onScoreUpdated }: ScoreHistoryProps) {
               </div>
             ) : (
               <div className="flex items-center gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
-                <Button size="icon" variant="ghost" className="text-slate-400 hover:text-white" onClick={() => handleEditClick(score)}>
+                <Button size="icon" variant="ghost" className="text-slate-400 hover:text-white" onClick={() => handleEditClick(score)} disabled={loading}>
                   <Pencil className="h-4 w-4" />
                 </Button>
-                <Button size="icon" variant="ghost" className="text-slate-400 hover:text-red-400" onClick={() => handleDelete(score.id)}>
+                <Button size="icon" variant="ghost" className="text-slate-400 hover:text-red-400" onClick={() => handleDelete(score.id)} disabled={loading}>
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </div>

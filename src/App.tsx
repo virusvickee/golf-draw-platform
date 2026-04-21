@@ -3,6 +3,7 @@ import { useEffect } from "react"
 import { useAuthStore } from "./store/authStore"
 import { MainLayout } from "./components/layout/MainLayout"
 import { AdminLayout } from "./components/layout/AdminLayout"
+import { ProtectedRoute } from "./components/layout/ProtectedRoute"
 
 // Pages
 import HomePage from "./pages/HomePage"
@@ -42,11 +43,17 @@ export default function App() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/auth" element={<AuthPage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/charities" element={<CharitiesPage />} />
           <Route path="/draws" element={<DrawsPage />} />
-          <Route path="/subscribe" element={<SubscribePage />} />
-          <Route path="/select-charity" element={<SelectCharityPage />} />
+          
+          <Route element={<ProtectedRoute />}>
+            <Route path="/subscribe" element={<SubscribePage />} />
+            <Route path="/select-charity" element={<SelectCharityPage />} />
+          </Route>
+          
+          <Route element={<ProtectedRoute requireSubscription />}>
+            <Route path="/dashboard" element={<DashboardPage />} />
+          </Route>
         </Route>
 
         {/* Admin Routes */}

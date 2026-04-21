@@ -1,15 +1,17 @@
-import { Outlet, Link, useLocation } from "react-router-dom"
-import { useSubscriptionGuard } from "../../hooks/useSubscriptionGuard"
+import { Outlet, Link, useLocation, Navigate } from "react-router-dom"
 import { Users, LayoutDashboard, Shuffle, HandHeart, Trophy, BarChart3, LogOut } from "lucide-react"
 import { Button } from "../ui/button"
 import { useAuthStore } from "../../store/authStore"
 
 export function AdminLayout() {
-  const { profile } = useSubscriptionGuard({ requireAuth: true, requireAdmin: true })
+  const { user, profile, loading } = useAuthStore()
   const { signOut } = useAuthStore()
   const location = useLocation()
 
-  if (profile?.role !== "admin") return null
+  // Ensure gating runs avoiding flicker
+  if (loading) return null
+  if (!user) return <Navigate to="/auth" state={{ from: location.pathname }} replace />
+  if (profile?.role !== "admin") return <Navigate to="/" replace />
 
   const navigation = [
     { name: "Overview", href: "/admin", icon: LayoutDashboard },

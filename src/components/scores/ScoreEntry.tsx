@@ -43,7 +43,18 @@ export function ScoreEntry({ scores, onScoreUpdated }: ScoreEntryProps) {
     setLoading(true)
 
     try {
-      // 2. If already 5 scores, delete oldest before inserting
+      // 2. Insert new score
+      const { error: insError } = await supabase
+        .from("scores")
+        .insert({
+          user_id: user.id,
+          score: numScore,
+          score_date: date
+        })
+
+      if (insError) throw insError
+
+      // 3. If already 5 scores, delete oldest after inserting
       if (scores.length >= 5) {
         // Sort ascending by score_date (oldest first)
         const sortedScores = [...scores].sort(
@@ -58,17 +69,6 @@ export function ScoreEntry({ scores, onScoreUpdated }: ScoreEntryProps) {
           
         if (delError) throw delError
       }
-
-      // 3. Insert new score
-      const { error: insError } = await supabase
-        .from("scores")
-        .insert({
-          user_id: user.id,
-          score: numScore,
-          score_date: date
-        })
-
-      if (insError) throw insError
 
       toast.success("Score added successfully!")
       setScore("")

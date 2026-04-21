@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { supabase } from "../lib/supabase"
 import { useAuthStore } from "../store/authStore"
 import { format, parseISO } from "date-fns"
-import type { Draw, Score } from "../types"
+import type { Draw } from "../types"
 import { checkMatch } from "../lib/drawEngine"
 
 export default function DrawsPage() {

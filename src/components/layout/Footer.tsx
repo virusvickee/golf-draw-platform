@@ -6,9 +6,9 @@ export function Footer() {
           &copy; {new Date().getFullYear()} Golf Draw Platform. All rights reserved.
         </p>
         <div className="mt-4 flex justify-center gap-4 text-sm">
-          <a href="#" className="hover:text-[#00FF87]">Terms of Service</a>
-          <a href="#" className="hover:text-[#00FF87]">Privacy Policy</a>
-          <a href="#" className="hover:text-[#00FF87]">Contact Support</a>
+          <a href="/terms" className="hover:text-[#00FF87]">Terms of Service</a>
+          <a href="/privacy" className="hover:text-[#00FF87]">Privacy Policy</a>
+          <a href="/support" className="hover:text-[#00FF87]">Contact Support</a>
         </div>
       </div>
     </footer>

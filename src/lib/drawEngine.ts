@@ -12,7 +12,7 @@ export const runRandomDraw = (): number[] => {
 export const runAlgorithmicDraw = (allScores: number[]): number[] => {
   // Build frequency map
   const freq: Record<number, number> = {}
-  allScores.forEach(s => { freq[s] = (freq[s] || 0) + 1 })
+  allScores.filter(s => s >= 1 && s <= 45).forEach(s => { freq[s] = (freq[s] || 0) + 1 })
   
   // Weight: least frequent scores get higher weight (more interesting draw)
   const maxFreq = Math.max(...Object.values(freq), 0)

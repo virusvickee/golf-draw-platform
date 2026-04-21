@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom"
 import { useAuthStore } from "../../store/authStore"
-import { Button } from "../ui/button"
+import { Button, buttonVariants } from "../ui/button"
+
 
 export function Navbar() {
   const { user, profile, signOut } = useAuthStore()
@@ -22,31 +23,15 @@ export function Navbar() {
           {user ? (
             <>
               {profile?.role === "admin" && (
-                <Link to="/admin">
-                  <Button variant="outline" className="border-[#FFD700] text-[#FFD700] hover:bg-[#FFD700]/10">
-                    Admin
-                  </Button>
-                </Link>
+                <Link to="/admin" className={buttonVariants({ variant: "outline", className: "border-[#FFD700] text-[#FFD700] hover:bg-[#FFD700]/10" })}>Admin</Link>
               )}
-              <Link to="/dashboard">
-                <Button variant="ghost" className="text-white hover:text-[#00FF87] hover:bg-white/5">
-                  Dashboard
-                </Button>
-              </Link>
+              <Link to="/dashboard" className={buttonVariants({ variant: "ghost", className: "text-white hover:text-[#00FF87] hover:bg-white/5" })}>Dashboard</Link>
               <Button variant="destructive" onClick={signOut}>Sign Out</Button>
             </>
           ) : (
             <>
-              <Link to="/auth">
-                <Button variant="ghost" className="text-white hover:text-[#00FF87] hover:bg-white/5">
-                  Log in
-                </Button>
-              </Link>
-              <Link to="/subscribe">
-                <Button className="bg-[#00FF87] text-[#080B14] hover:bg-[#00FF87]/90 font-bold">
-                  Subscribe Now
-                </Button>
-              </Link>
+              <Link to="/auth" className={buttonVariants({ variant: "ghost", className: "text-white hover:text-[#00FF87] hover:bg-white/5" })}>Log in</Link>
+              <Link to="/subscribe" className={buttonVariants({ className: "bg-[#00FF87] text-[#080B14] hover:bg-[#00FF87]/90 font-bold" })}>Subscribe Now</Link>
             </>
           )}
         </div>

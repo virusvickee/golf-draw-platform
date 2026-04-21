@@ -8,7 +8,9 @@ interface GuardOptions {
   requireSubscription?: boolean
 }
 
-export function useSubscriptionGuard(options: GuardOptions = { requireAuth: true }) {
+export function useSubscriptionGuard(options?: GuardOptions) {
+  const mergedOptions = { requireAuth: true, ...options }
+  const { requireAuth, requireAdmin, requireSubscription } = mergedOptions
   const { user, profile, subscription, loading } = useAuthStore()
   const navigate = useNavigate()
   const location = useLocation()
@@ -18,26 +20,26 @@ export function useSubscriptionGuard(options: GuardOptions = { requireAuth: true
     if (loading) return
 
     // 1. Require Auth Check
-    if (options.requireAuth && !user) {
+    if (requireAuth && !user) {
       navigate("/auth", { replace: true, state: { from: location.pathname } })
       return
     }
 
     // 2. Require Admin Check
-    if (options.requireAdmin && profile?.role !== "admin") {
+    if (requireAdmin && profile?.role !== "admin") {
       navigate("/dashboard", { replace: true })
       return
     }
 
     // 3. Require Subscription Check
-    if (options.requireSubscription) {
+    if (requireSubscription) {
       if (!subscription || subscription.status !== "active") {
         // If not active, redirect to subscribe page
         navigate("/subscribe", { replace: true, state: { lapsed: subscription?.status === "lapsed" } })
         return
       }
     }
-  }, [user, profile, subscription, loading, navigate, location, options])
+  }, [user, profile, subscription, loading, navigate, location.pathname, requireAuth, requireAdmin, requireSubscription])
 
   return { user, profile, subscription, loading }
 }

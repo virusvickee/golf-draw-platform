@@ -35,17 +35,23 @@ export default function AdminAnalytics() {
   }, [])
 
   const fetchHighLevelStats = async () => {
-    const { count } = await supabase.from("subscriptions").select("*", { count: 'exact' }).eq('status', 'active')
-    const subs = count || 0
-    
-    // Monthly sub = £9.99
-    const rev = subs * 9.99
-    
-    setStats({
-      activeSubscribers: subs,
-      revenue: rev,
-      currentPool: rev * 0.50 // Assuming 50%
-    })
+    try {
+      const { count, error } = await supabase.from("subscriptions").select("*", { count: 'exact', head: true }).eq('status', 'active')
+      if (error) throw error
+      
+      const subs = count || 0
+      
+      // Monthly sub = £9.99
+      const rev = subs * 9.99
+      
+      setStats({
+        activeSubscribers: subs,
+        revenue: rev,
+        currentPool: rev * 0.50 // Assuming 50%
+      })
+    } catch (err: any) {
+      console.error("Failed to fetch analytics:", err)
+    }
   }
 
   return (

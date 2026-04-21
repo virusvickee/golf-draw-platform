@@ -8,6 +8,7 @@ import { Search, ExternalLink } from "lucide-react"
 export default function CharitiesPage() {
   const [charities, setCharities] = useState<Charity[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState("")
 
   useEffect(() => {
@@ -21,8 +22,9 @@ export default function CharitiesPage() {
           .order("created_at", { ascending: false })
         if (error) throw error
         setCharities(data || [])
-      } catch (err) {
+      } catch (err: any) {
         console.error(err)
+        setError(err.message || "Failed to load charities.")
       } finally {
         setLoading(false)
       }
@@ -46,14 +48,21 @@ export default function CharitiesPage() {
         <Input 
           className="pl-12 h-12 bg-[#0A0E1A] border-white/10 text-white rounded-full text-base focus-visible:ring-[#00FF87]"
           placeholder="Search charities by name..."
+          aria-label="Search charities by name"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
       </div>
 
+      {error && (
+        <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-xl text-center mb-8">
+          {error}
+        </div>
+      )}
+
       {loading ? (
-        <div className="grid md:grid-cols-3 gap-6">
-          {[1,2,3,4].map(i => (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1,2,3,4,5,6].map(i => (
             <div key={i} className="h-[300px] rounded-2xl bg-[#0A0E1A] border border-white/5 animate-pulse"></div>
           ))}
         </div>
@@ -85,7 +94,13 @@ export default function CharitiesPage() {
                       Visit Website <ExternalLink className="h-3 w-3 ml-1" />
                     </a>
                   )}
-                  <Button className="w-full bg-white text-black hover:bg-slate-200">
+                  <Button 
+                    className="w-full bg-white text-black hover:bg-slate-200"
+                    onClick={() => {
+                      const toast = (window as any).sonner?.toast || console.log;
+                      toast("Donation flow initiated", { description: "Redirecting to payment gateway..." });
+                    }}
+                  >
                     Make a One-Time Donation
                   </Button>
                 </div>

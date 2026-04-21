@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom"
-import { Button } from "../ui/button"
+
 
 export function SubscribeCTA() {
   return (
@@ -14,10 +14,8 @@ export function SubscribeCTA() {
           Join the platform where your Stableford scores enter you to win grand prizes, while supporting the charities you love.
         </p>
         
-        <Link to="/subscribe">
-          <Button size="lg" className="h-16 px-12 text-xl font-bold bg-[#FFD700] text-[#080B14] hover:bg-white transition-colors rounded-full shadow-[0_0_30px_rgba(255,215,0,0.4)]">
-            Start Your Sandbox
-          </Button>
+        <Link to="/subscribe" className="inline-flex items-center justify-center h-16 px-12 text-xl font-bold bg-[#FFD700] text-[#080B14] hover:bg-white transition-colors rounded-full shadow-[0_0_30px_rgba(255,215,0,0.4)]">
+          Start Your Sandbox
         </Link>
         <div className="mt-6 text-sm text-slate-400 font-medium">
           Cancel anytime. No hidden fees.

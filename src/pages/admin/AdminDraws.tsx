@@ -5,7 +5,6 @@ import { Button } from "../../components/ui/button"
 import { Switch } from "../../components/ui/switch"
 import { Label } from "../../components/ui/label"
 import { toast } from "sonner"
-import type { Draw } from "../../types"
 
 // Draw state requires robust handling of pool constraints and participant scores
 export default function AdminDraws() {

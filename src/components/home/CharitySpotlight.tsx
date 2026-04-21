@@ -43,7 +43,7 @@ export function CharitySpotlight() {
 
         <div className="grid md:grid-cols-3 gap-6">
           {charities.map(charity => (
-            <div key={charity.id} className="group rounded-2xl overflow-hidden bg-[#0A0E1A] border border-white/5 hover:border-[#00FF87]/50 transition-all">
+            <Link to="/charities" key={charity.id} className="group block rounded-2xl overflow-hidden bg-[#0A0E1A] border border-white/5 hover:border-[#00FF87]/50 transition-all">
               <div className="h-48 overflow-hidden">
                 <img 
                   src={charity.image} 
@@ -58,7 +58,7 @@ export function CharitySpotlight() {
                   Choose this charity →
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
