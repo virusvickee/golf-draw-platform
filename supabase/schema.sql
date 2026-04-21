@@ -3,8 +3,21 @@
 -- Run this entire file in Supabase SQL Editor
 -- =============================================
 
+-- CLEANUP (Uncomment if you want to reset everything)
+-- drop table if exists public.charity_contributions cascade;
+-- drop table if exists public.winners cascade;
+-- drop table if exists public.draw_entries cascade;
+-- drop table if exists public.draws cascade;
+-- drop table if exists public.scores cascade;
+-- drop table if exists public.subscriptions cascade;
+-- drop table if exists public.profiles cascade;
+-- drop table if exists public.charity_events cascade;
+-- drop table if exists public.charities cascade;
+-- drop function if exists public.is_admin cascade;
+-- drop function if exists public.handle_new_user cascade;
+
 -- CHARITIES (must be created FIRST — profiles references it)
-create table public.charities (
+create table if not exists public.charities (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   description text,
@@ -16,7 +29,7 @@ create table public.charities (
 );
 
 -- CHARITY EVENTS
-create table public.charity_events (
+create table if not exists public.charity_events (
   id uuid primary key default gen_random_uuid(),
   charity_id uuid references public.charities(id) on delete cascade,
   title text not null,
@@ -26,7 +39,7 @@ create table public.charity_events (
 );
 
 -- USERS / PROFILES (after charities)
-create table public.profiles (
+create table if not exists public.profiles (
   id uuid references auth.users(id) on delete cascade primary key,
   full_name text not null,
   email text not null,
@@ -37,7 +50,7 @@ create table public.profiles (
 );
 
 -- SUBSCRIPTIONS
-create table public.subscriptions (
+create table if not exists public.subscriptions (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references public.profiles(id) on delete cascade not null,
   plan text not null check (plan in ('monthly', 'yearly')),
@@ -51,7 +64,7 @@ create table public.subscriptions (
 );
 
 -- SCORES
-create table public.scores (
+create table if not exists public.scores (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references public.profiles(id) on delete cascade not null,
   score int not null check (score >= 1 and score <= 45),
@@ -61,7 +74,7 @@ create table public.scores (
 );
 
 -- DRAWS
-create table public.draws (
+create table if not exists public.draws (
   id uuid primary key default gen_random_uuid(),
   draw_month timestamptz not null,
   status text default 'pending' check (status in ('pending', 'simulated', 'published')),
@@ -78,7 +91,7 @@ create table public.draws (
 );
 
 -- DRAW ENTRIES
-create table public.draw_entries (
+create table if not exists public.draw_entries (
   id uuid primary key default gen_random_uuid(),
   draw_id uuid references public.draws(id) on delete cascade not null,
   user_id uuid references public.profiles(id) on delete cascade not null,
@@ -90,7 +103,7 @@ create table public.draw_entries (
 );
 
 -- WINNERS
-create table public.winners (
+create table if not exists public.winners (
   id uuid primary key default gen_random_uuid(),
   draw_id uuid references public.draws(id) on delete cascade not null,
   user_id uuid references public.profiles(id) on delete cascade not null,
@@ -103,7 +116,7 @@ create table public.winners (
 );
 
 -- CHARITY CONTRIBUTIONS
-create table public.charity_contributions (
+create table if not exists public.charity_contributions (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references public.profiles(id) on delete set null not null,
   charity_id uuid references public.charities(id) on delete set null not null,
@@ -129,6 +142,7 @@ begin
 end;
 $$ language plpgsql security definer;
 
+drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
@@ -163,47 +177,62 @@ $$ language plpgsql security definer set search_path = public;
 -- =============================================
 
 -- Profiles
+drop policy if exists "Users manage own profile" on public.profiles;
 create policy "Users manage own profile" on public.profiles
   for all using (id = auth.uid() or public.is_admin());
 
 -- Scores
+drop policy if exists "Users manage own scores" on public.scores;
 create policy "Users manage own scores" on public.scores
   for all using (auth.uid() = user_id or public.is_admin());
 
 -- Subscriptions
+drop policy if exists "Users view own subscription" on public.subscriptions;
 create policy "Users view own subscription" on public.subscriptions
   for select using (auth.uid() = user_id or public.is_admin());
+drop policy if exists "Admins manage subscriptions" on public.subscriptions;
 create policy "Admins manage subscriptions" on public.subscriptions
   for all using (public.is_admin());
 
 -- Winners
+drop policy if exists "Users view own winners" on public.winners;
 create policy "Users view own winners" on public.winners
   for select using (auth.uid() = user_id or public.is_admin());
+drop policy if exists "Admins manage winners" on public.winners;
 create policy "Admins manage winners" on public.winners
   for all using (public.is_admin());
 
 -- Charities
+drop policy if exists "Anyone view charities" on public.charities;
 create policy "Anyone view charities" on public.charities
   for select using (true);
+drop policy if exists "Admins manage charities" on public.charities;
 create policy "Admins manage charities" on public.charities
   for all using (public.is_admin());
 
 -- Draws
+drop policy if exists "Anyone view published draws" on public.draws;
 create policy "Anyone view published draws" on public.draws
   for select using (status = 'published' or public.is_admin());
+drop policy if exists "Admins manage draws" on public.draws;
 create policy "Admins manage draws" on public.draws
   for all using (public.is_admin());
 
 -- Draw Entries
+drop policy if exists "draw_entries_owner_select" on public.draw_entries;
 create policy "draw_entries_owner_select" on public.draw_entries
   for select using (auth.uid() = user_id);
+drop policy if exists "draw_entries_admin_all" on public.draw_entries;
 create policy "draw_entries_admin_all" on public.draw_entries
   for all using (public.is_admin());
 
 -- Charity Contributions
+drop policy if exists "charity_contributions_owner_select" on public.charity_contributions;
 create policy "charity_contributions_owner_select" on public.charity_contributions
   for select using (auth.uid() = user_id);
+drop policy if exists "charity_contributions_admin_read" on public.charity_contributions;
 create policy "charity_contributions_admin_read" on public.charity_contributions
   for select using (public.is_admin());
+drop policy if exists "charity_contributions_owner_insert" on public.charity_contributions;
 create policy "charity_contributions_owner_insert" on public.charity_contributions
   for insert with check (auth.uid() = user_id);
