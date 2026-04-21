@@ -32,7 +32,7 @@ create table public.profiles (
   email text not null,
   role text not null default 'subscriber' check (role in ('subscriber', 'admin')),
   selected_charity_id uuid references public.charities(id),
-  charity_contribution_percent int default 10 check (charity_contribution_percent >= 10 and charity_contribution_percent <= 100),
+  charity_contribution_percent int default 10 check (charity_contribution_percent >= 10 and charity_contribution_percent <= 50),
   created_at timestamptz default now()
 );
 
@@ -151,13 +151,12 @@ alter table public.charity_contributions enable row level security;
 create or replace function public.is_admin()
 returns boolean as $$
 begin
-  SET search_path = public, pg_temp;
   return exists (
     select 1 from public.profiles
     where id = auth.uid() and role = 'admin'
   );
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql security definer set search_path = public;
 
 -- =============================================
 -- RLS POLICIES
@@ -165,7 +164,7 @@ $$ language plpgsql security definer;
 
 -- Profiles
 create policy "Users manage own profile" on public.profiles
-  for all using (auth.uid() = id or public.is_admin());
+  for all using (id = auth.uid() or public.is_admin());
 
 -- Scores
 create policy "Users manage own scores" on public.scores
