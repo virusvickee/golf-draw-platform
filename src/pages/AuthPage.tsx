@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
 import { supabase } from "../lib/supabase"
 import { useAuthStore } from "../store/authStore"
 import { Button } from "../components/ui/button"
@@ -10,6 +10,7 @@ import { toast } from "sonner"
 
 export default function AuthPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { fetchUser } = useAuthStore()
   const [loading, setLoading] = useState(false)
 
@@ -62,9 +63,15 @@ export default function AuthPage() {
       await fetchUser()
       toast.success("Logged in successfully!")
       
-      // Determine redirect based on profile role & subscription
-      // We'll rely on the global navigation context or handle basic redirect here
-      navigate("/dashboard") // Main redirect, SubscriptionGuard will handle admin/lapsed checks
+      // Determine redirect based on location state
+      const from = (location.state as any)?.from
+      
+      if (from) {
+        const redirectPath = from.pathname + (from.search || "") + (from.hash || "")
+        navigate(redirectPath, { replace: true })
+      } else {
+        navigate("/dashboard")
+      }
     } catch (error: any) {
       toast.error(error.message || "Failed to log in")
     } finally {

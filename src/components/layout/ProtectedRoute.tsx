@@ -14,7 +14,7 @@ export function ProtectedRoute({ requireSubscription }: ProtectedRouteProps) {
   }
 
   if (!user) {
-    return <Navigate to="/auth" state={{ from: location.pathname }} replace />
+    return <Navigate to="/auth" state={{ from: location }} replace />
   }
 
   if (requireSubscription && (!subscription || subscription.status !== "active")) {

@@ -4,6 +4,7 @@ import { Button } from "../components/ui/button"
 import { Input } from "../components/ui/input"
 import type { Charity } from "../types"
 import { Search, ExternalLink } from "lucide-react"
+import { toast } from "sonner"
 
 export default function CharitiesPage() {
   const [charities, setCharities] = useState<Charity[]>([])
@@ -95,13 +96,15 @@ export default function CharitiesPage() {
                     </a>
                   )}
                   <Button 
-                    className="w-full bg-white text-black hover:bg-slate-200"
+                    disabled
+                    className="w-full bg-white/50 text-black cursor-not-allowed"
                     onClick={() => {
-                      const toast = (window as any).sonner?.toast || console.log;
-                      toast("Donation flow initiated", { description: "Redirecting to payment gateway..." });
+                      toast("Donation feature coming soon!", { 
+                        description: "One-time donations will be available in the next phase." 
+                      });
                     }}
                   >
-                    Make a One-Time Donation
+                    Coming Soon
                   </Button>
                 </div>
               </div>

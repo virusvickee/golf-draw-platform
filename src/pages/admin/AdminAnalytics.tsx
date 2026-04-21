@@ -8,6 +8,7 @@ export default function AdminAnalytics() {
     currentPool: 0,
     revenue: 0
   })
+  const [fetchError, setFetchError] = useState<string | null>(null)
 
   // Mocking detailed charting data due to empty db
   const monthlyRevenueData = [
@@ -49,8 +50,10 @@ export default function AdminAnalytics() {
         revenue: rev,
         currentPool: rev * 0.50 // Assuming 50%
       })
+      setFetchError(null)
     } catch (err: any) {
       console.error("Failed to fetch analytics:", err)
+      setFetchError("Failed to load real-time stats. Displaying cached/null values.")
     }
   }
 
@@ -60,6 +63,12 @@ export default function AdminAnalytics() {
         <h1 className="text-3xl font-bold">Analytics & Overview</h1>
         <p className="text-slate-400 mt-1">Platform performance and distribution metrics</p>
       </div>
+
+      {fetchError && (
+        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm">
+          {fetchError}
+        </div>
+      )}
 
       {/* KPI Cards */}
       <div className="grid md:grid-cols-3 gap-6">

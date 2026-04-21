@@ -9,8 +9,9 @@ export function AdminLayout() {
   const location = useLocation()
 
   // Ensure gating runs avoiding flicker
-  if (loading) return null
-  if (!user) return <Navigate to="/auth" state={{ from: location.pathname }} replace />
+  // Wait if auth is loading OR if user exists but profile isn't loaded yet
+  if (loading || (user && !profile)) return null
+  if (!user) return <Navigate to="/auth" state={{ from: location }} replace />
   if (profile?.role !== "admin") return <Navigate to="/" replace />
 
   const navigation = [
