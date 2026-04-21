@@ -73,3 +73,21 @@ SET
   selected_charity_id = (SELECT id FROM public.charities LIMIT 1),
   charity_contribution_percent = 20
 WHERE id = '22222222-2222-2222-2222-222222222222';
+
+-- 3. SEED INITIAL SUBSCRIPTION
+INSERT INTO public.subscriptions (
+  user_id,
+  plan,
+  status,
+  amount_paid,
+  current_period_start,
+  current_period_end
+) VALUES (
+  '22222222-2222-2222-2222-222222222222',
+  'monthly',
+  'active',
+  9.99,
+  now(),
+  now() + interval '1 month'
+);
+
