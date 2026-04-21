@@ -63,14 +63,25 @@ export default function AuthPage() {
       await fetchUser()
       toast.success("Logged in successfully!")
       
-      // Determine redirect based on location state
+      // Determine redirect based on location state or user role
       const from = (location.state as any)?.from
       
       if (from) {
         const redirectPath = from.pathname + (from.search || "") + (from.hash || "")
         navigate(redirectPath, { replace: true })
       } else {
-        navigate("/dashboard")
+        // Fetch the user data again to ensure we have the profile role
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", (await supabase.auth.getUser()).data.user?.id)
+          .single()
+
+        if (profile?.role === "admin") {
+          navigate("/admin")
+        } else {
+          navigate("/dashboard")
+        }
       }
     } catch (error: any) {
       toast.error(error.message || "Failed to log in")
